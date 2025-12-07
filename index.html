@@ -53,12 +53,12 @@
             <form>
                 <div>
                     <textarea class="archiveTextarea" id="textArchive" rows="3"
-                        placeholder="Add text to archive"></textarea>
+                        placeholder="Вставьтте сюда текст, который вы хотите передать в зашифрованном архиве."></textarea>
                 </div>
 
 
             </form>
-            <button id="btnCreate" type="button">Create</button>
+            <button id="btnCreate" type="button">Создать архив</button>
         </div>
 
         <div id="formResult" style="display: none;">
@@ -70,7 +70,7 @@
 
 
             </form>
-            <button id="btnRefresh" type="button">OK</button>
+            <button id="btnRefresh" type="button">Назад</button>
         </div>
     </div>
 
@@ -113,27 +113,12 @@
         jQuery("#btnCreate, #btnRefresh").button();
 
         jQuery("#btnRefresh").on("click", function () {
-            jQuery("#formResult").hide("fade", "", 1000, callbackCreate);
+            jQuery("#formResult").fadeOut(500, callbackCreate);
         });
 
 
 
         jQuery("#btnCreate").on("click", function () {
-
-            function randomPassword_old() {
-                var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$_+?%^&)";
-                var size = 10;
-                var i = 1;
-                var ret = ""
-                while (i <= size) {
-                    $max = chars.length - 1;
-                    $num = Math.floor(Math.random() * $max);
-                    $temp = chars.substr($num, 1);
-                    ret += $temp;
-                    i++;
-                }
-                return ret;
-            }
 
             function randomPassword(length = 10) {
                 // Characters allowed in the password
@@ -177,7 +162,7 @@
             jQuery("#viewPass").val(genPass);
             $("#dialog").dialog("open");
             jQuery("#textArchive").val("");
-            jQuery("#formCreate").hide("fade", "", 1000, callbackResult);
+            jQuery("#formCreate").fadeOut(500, callbackCreate);
         });
     </script>
 
