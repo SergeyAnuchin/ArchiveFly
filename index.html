@@ -35,6 +35,28 @@
             min-width: 5in;
             min-height: 2in;
         }
+
+        .button {
+            padding: 0.5rem 0.75rem;
+            border: none;
+            border-radius: 4px;
+            background: #3b82f6;
+            color: #fff;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 5rem;
+            right: 5rem;
+            background: #333;
+            color: #fff;
+            padding: .75rem 1rem;
+            border-radius: 4px;
+            opacity: .9;
+            z-index: 1000;
+        }
     </style>
 
 </head>
@@ -58,19 +80,24 @@
 
 
             </form>
-            <button id="btnCreate" type="button">Создать архив</button>
+            <button id="btnCreate" type="button" class="button">Создать архив</button>
         </div>
 
         <div id="formResult" style="display: none;">
             <h2 class="archiveHeaders">Пароль</h2>
             <form>
-                <div>
-                    <input id="viewPass" type="text" />
+                <div style="top:1rem; right:1rem; display:flex; align-items:center; gap:0.5rem; z-index:auto;">
+                    <input id="viewPass" type="text"
+                        style="padding:0.5rem 0.75rem; border:1px solid #ddd; border-radius:4px; font-size:1rem; font-family:inherit; background:#fafafa;"
+                        readonly />
+                    <button id="copyPass" type="button" title="Copy password" class="button">
+                        Copy
+                    </button>
                 </div>
 
 
             </form>
-            <button id="btnRefresh" type="button">Назад</button>
+            <button id="btnRefresh" type="button" class="button">Назад</button>
         </div>
     </div>
 
@@ -78,6 +105,21 @@
     <script src="jquery.min.js"></script>
     <script src="jquery-ui.min.js"></script>
     <script type="text/javascript" src="zip.min.js"></script>
+    <script>
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000); // hide after 3 s
+        }
+        document.getElementById('copyPass').addEventListener('click', () => {
+            const pwd = document.getElementById('viewPass').value;
+            navigator.clipboard.writeText(pwd).then(() => {
+                showToast('Пароль скопирован в буфер обмена!');
+            });
+        });
+    </script>
     <script>
         async function getZipFileBlob(genPass) {
             zip.configure({
@@ -121,30 +163,22 @@
         jQuery("#btnCreate").on("click", function () {
 
             function randomPassword(length = 10) {
-                // Characters allowed in the password
                 const CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$_+?%^&)";
 
-                // The number of *unique* characters you can pick from
-                const CHARS_LEN = CHARS.length; // 65 in this example
-
-                // Number of bytes we need from crypto.getRandomValues
-                // 6 bits are enough to cover 65 possibilities (2^6 = 64 < 65)
+                const CHARS_LEN = CHARS.length;
                 const BITS_PER_BYTE = 6;
-                const MASK = (1 << BITS_PER_BYTE) - 1; // 0b111111 => 63
+                const MASK = (1 << BITS_PER_BYTE) - 1;
 
                 const result = [];
-                const randomBytes = new Uint8Array(length * 2); // allocate twice as many just in case
+                const randomBytes = new Uint8Array(length * 2);
 
                 let generated = 0;
                 while (generated < length) {
-                    // Grab enough random bytes from the crypto API
                     crypto.getRandomValues(randomBytes);
 
                     for (let i = 0; i < randomBytes.length && generated < length; i++) {
-                        // Take the lowest 6 bits of each byte
                         const index = randomBytes[i] & MASK; // 0‑63
 
-                        // Reject values >= CHARS_LEN to keep the distribution uniform
                         if (index < CHARS_LEN) {
                             result.push(CHARS[index]);
                             generated++;
