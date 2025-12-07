@@ -11,16 +11,16 @@
             font-family: "Trebuchet MS", sans-serif;
             margin: 50px;
         }
-        
+
         .archiveHeaders {
             margin-top: 2em;
         }
-        
+
         .archiveTextarea {
             min-width: 5in;
             min-height: 2in;
         }
-        
+
         .modal {
             padding: 50px;
             position: fixed;
@@ -30,7 +30,7 @@
             -ms-transform: translate(-50%, -50%);
             transform: translate(-50%, -50%);
         }
-        
+
         form {
             min-width: 5in;
             min-height: 2in;
@@ -42,17 +42,18 @@
 <body>
     <div class="modal">
         <div>
-            <h2>ZIP Form</h1>
-                <div class="ui-widget">
-                    <p>Форма для создания архива</p>
-                </div>
+            <h2>ZIP Form</h2>
+            <div class="ui-widget">
+                <p>Форма для создания архива</p>
+            </div>
         </div>
 
         <div id="formCreate">
             <h2 class="archiveHeaders">Введите данные</h2>
             <form>
                 <div>
-                    <textarea class="archiveTextarea" id="textArchive" rows="3" placeholder="Add text to archive"></textarea>
+                    <textarea class="archiveTextarea" id="textArchive" rows="3"
+                        placeholder="Add text to archive"></textarea>
                 </div>
 
 
@@ -111,15 +112,15 @@
 
         jQuery("#btnCreate, #btnRefresh").button();
 
-        jQuery("#btnRefresh").on("click", function() {
+        jQuery("#btnRefresh").on("click", function () {
             jQuery("#formResult").hide("fade", "", 1000, callbackCreate);
         });
 
 
 
-        jQuery("#btnCreate").on("click", function() {
+        jQuery("#btnCreate").on("click", function () {
 
-            function randomPassword() {
+            function randomPassword_old() {
                 var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$_+?%^&)";
                 var size = 10;
                 var i = 1;
@@ -132,6 +133,41 @@
                     i++;
                 }
                 return ret;
+            }
+
+            function randomPassword(length = 10) {
+                // Characters allowed in the password
+                const CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$_+?%^&)";
+
+                // The number of *unique* characters you can pick from
+                const CHARS_LEN = CHARS.length; // 65 in this example
+
+                // Number of bytes we need from crypto.getRandomValues
+                // 6 bits are enough to cover 65 possibilities (2^6 = 64 < 65)
+                const BITS_PER_BYTE = 6;
+                const MASK = (1 << BITS_PER_BYTE) - 1; // 0b111111 => 63
+
+                const result = [];
+                const randomBytes = new Uint8Array(length * 2); // allocate twice as many just in case
+
+                let generated = 0;
+                while (generated < length) {
+                    // Grab enough random bytes from the crypto API
+                    crypto.getRandomValues(randomBytes);
+
+                    for (let i = 0; i < randomBytes.length && generated < length; i++) {
+                        // Take the lowest 6 bits of each byte
+                        const index = randomBytes[i] & MASK; // 0‑63
+
+                        // Reject values >= CHARS_LEN to keep the distribution uniform
+                        if (index < CHARS_LEN) {
+                            result.push(CHARS[index]);
+                            generated++;
+                        }
+                    }
+                }
+
+                return result.join("");
             }
 
             var genPass = randomPassword();
